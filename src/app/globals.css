@@ -48,7 +48,7 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-:root {
+/* :root {
   --background: oklch(1 0 0);
   --foreground: oklch(0.145 0 0);
   --card: oklch(1 0 0);
@@ -81,7 +81,22 @@
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
+} */
+
+:root {
+  --background: #09090b;
+  --surface: #111113;
+  --surface-2: #18181b;
+  --border: #27272a;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --foreground: #fafafa;
+  --muted: #a1a1aa;
+  --success: #22c55e;
+  --warning: #eab308;
+  --danger: #ef4444;
 }
+
 
 .dark {
   --background: oklch(0.145 0 0);
@@ -128,3 +143,4 @@
     @apply font-sans;
   }
 }
+
