@@ -49,7 +49,7 @@ export default function RegisterPage() {
 
 
 
-const { data, error } = await authClient.signUp.email({
+const { error: signUpError } = await authClient.signUp.email({
     name: name, // required, The name of the user.
     email: email, // required, The email address of the user.
     password: password, // required, The password of the user. It should be at least 8 characters long and max 128 by default.
@@ -57,22 +57,34 @@ const { data, error } = await authClient.signUp.email({
     callbackURL: '/login', // An optional URL to redirect to after the user signs up.
 });
 
+
     if (!name || !email || !password || !confirmPassword) {
       setError("Please fill in all required fields.");
+      toast.error("Missing details", "Please fill in all required fields.");
       return;
     }
 
     if (password.length < 6 || !/[A-Z]/.test(password) || !/[a-z]/.test(password)) {
       setError("Password needs 6+ characters, one uppercase and one lowercase letter.");
+      toast.error("Weak password", "Use 6+ characters with one uppercase and one lowercase letter.");
       return;
     }
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
+      toast.error("Passwords do not match", "Please re-enter your password.");
+      return;
+    }
+
+    if (signUpError) {
+      const message = signUpError.message || "Unable to create your account.";
+      setError(message);
+      toast.error("Registration failed", message);
       return;
     }
 
     setSuccess("Form validated successfully! Connect your authentication next.");
+    toast.success("Account created!", "You can now sign in with your email.");
     
 
          router.push("/login");
@@ -82,6 +94,20 @@ const { data, error } = await authClient.signUp.email({
 
   const inputClass =
     "w-full bg-[#0c0d12] border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-sm text-white placeholder:text-gray-500 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 hover:border-white/20";
+
+
+
+
+const handelGoogleRegister = async () => {
+
+
+ const data = await authClient.signIn.social({
+    provider: "google",
+  });
+    }
+
+
+
 
   return (
     <main className="min-h-screen bg-[#08090d] text-white flex items-center justify-center px-4 py-12 relative overflow-hidden">
@@ -119,6 +145,7 @@ const { data, error } = await authClient.signUp.email({
 
           {/* Google button - connect provider separately */}
           <button
+          onClick={handelGoogleRegister}
             type="button"
             className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.07] transition-colors text-sm font-medium"
           >

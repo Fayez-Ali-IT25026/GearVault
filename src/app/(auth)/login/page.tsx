@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
+import { toast } from "@/components/ui/toast";
 
 
 
@@ -36,7 +37,7 @@ export default function LoginPage() {
     const password = result.get("password") as string;
 
 
-    const { data, error } = await authClient.signIn.email({
+    const { error: signInError } = await authClient.signIn.email({
     email: email, // required, The email address of the user.
     password: password, // required, The password of the user. It should be at least 8 characters long and max 128 by default.
     rememberMe: true, // If false, the user will be signed out when the browser is closed. (optional) (default: true)
@@ -47,16 +48,41 @@ export default function LoginPage() {
 
     if (!email || !password) {
       setError("Please enter your email and password.");
+      toast.error("Missing details", "Please enter your email and password.");
+      return;
+    }
+
+    if (signInError) {
+      const message = signInError.message || "Invalid email or password.";
+      setError(message);
+      toast.error("Sign in failed", message);
       return;
     }
 
     setSuccess("Form validated successfully! ");
+    toast.success("Welcome back!", "You are now signed in.");
        router.push("/");
       router.refresh();
   };
 
   const inputClass =
     "w-full bg-[#0c0d12] border border-white/10 rounded-xl py-3.5 pl-11 pr-4 text-sm text-white placeholder:text-gray-500 outline-none transition-all duration-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 hover:border-white/20";
+
+
+      const handleGoogleLogin = async () => {
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        
+      });
+    } catch (error) {
+      console.error("Google login error:", error);
+      toast.error("Google login failed. Please try again.");
+    }
+  };
+
+
+
 
   return (
     <main className="min-h-screen bg-[#08090d] text-white flex items-center justify-center px-4 py-12 relative overflow-hidden">
@@ -94,6 +120,7 @@ export default function LoginPage() {
 
           {/* Google login - connect provider separately */}
           <button
+            onClick={handleGoogleLogin}
             type="button"
             className="w-full flex items-center justify-center gap-3 py-3 rounded-xl border border-white/10 bg-white/[0.03] hover:bg-white/[0.07] transition-colors text-sm font-medium"
           >
