@@ -13,29 +13,46 @@ import {
   CheckCircle2,
   LogIn,
 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+
+
 
 export default function LoginPage() {
+    const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
     const form = e.currentTarget;
-    const data = new FormData(form);
+    const result = new FormData(form);
 
-    const email = data.get("email") as string;
-    const password = data.get("password") as string;
+    const email = result.get("email") as string;
+    const password = result.get("password") as string;
+
+
+    const { data, error } = await authClient.signIn.email({
+    email: email, // required, The email address of the user.
+    password: password, // required, The password of the user. It should be at least 8 characters long and max 128 by default.
+    rememberMe: true, // If false, the user will be signed out when the browser is closed. (optional) (default: true)
+    callbackURL: "/", // An optional URL to redirect to after the user signs in. (optional)
+});
+
+
 
     if (!email || !password) {
       setError("Please enter your email and password.");
       return;
     }
 
-    setSuccess("Form validated successfully! Connect Better Auth next.");
+    setSuccess("Form validated successfully! ");
+       router.push("/");
+      router.refresh();
   };
 
   const inputClass =

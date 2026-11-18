@@ -14,26 +14,48 @@ import {
   ArrowRight,
   CheckCircle2,
 } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
+import { toast } from "@/components/ui/toast";
+
+
+
+
 
 export default function RegisterPage() {
+
+
+
+    const router = useRouter();
+
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
     const form = e.currentTarget;
-    const data = new FormData(form);
+    const result = new FormData(form);
 
-    const name = data.get("name") as string;
-    const email = data.get("email") as string;
-    const image = data.get("image") as string;
-    const password = data.get("password") as string;
-    const confirmPassword = data.get("confirmPassword") as string;
+ const name = result.get("name") as string;
+    const email = result.get("email") as string;
+    const image = result.get("image") as string;
+    const password = result.get("password") as string;
+    const confirmPassword = result.get("confirmPassword") as string;
+
+
+
+const { data, error } = await authClient.signUp.email({
+    name: name, // required, The name of the user.
+    email: email, // required, The email address of the user.
+    password: password, // required, The password of the user. It should be at least 8 characters long and max 128 by default.
+    image: image, // An optional profile image of the user.
+    callbackURL: '/login', // An optional URL to redirect to after the user signs up.
+});
 
     if (!name || !email || !password || !confirmPassword) {
       setError("Please fill in all required fields.");
@@ -51,6 +73,11 @@ export default function RegisterPage() {
     }
 
     setSuccess("Form validated successfully! Connect your authentication next.");
+    
+
+         router.push("/login");
+          router.refresh();
+
   };
 
   const inputClass =
