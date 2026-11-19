@@ -17,3 +17,52 @@ export type DashboardNavItem = {
   href: string;
   icon: LucideIcon;
 };
+
+/** Options for the equipment listing form. */
+export type EquipmentCondition = "New" | "Like New" | "Good" | "Fair";
+export type RentalType = "Daily" | "Weekly" | "Monthly";
+export type EquipmentStatus = "Pending" | "Approved" | "Rejected";
+
+export type EquipmentCategory =
+  | "Construction Equipment"
+  | "Photography Equipment"
+  | "Vehicles & Transportation"
+  | "Agriculture Equipment"
+  | "Electronics"
+  | "Event Equipment";
+
+/** Values collected by the Add Equipment form. */
+export type EquipmentFormValues = {
+  name: string;
+  description: string;
+  category: string;
+  brand: string;
+  model: string;
+  condition: EquipmentCondition;
+  rentPrice: string;
+  rentalType: RentalType;
+  quantity: string;
+  location: string;
+  image: string;
+  terms: string;
+};
+
+/** The JSON body sent to the backend POST /equipment endpoint. */
+export type EquipmentPayload = {
+  name: string;
+  description: string;
+  category: string;
+  brand: string;
+  model: string;
+  condition: EquipmentCondition;
+  rentPrice: number;
+  rentalType: RentalType;
+  quantity: number;
+  location: string;
+  image: string;
+  terms: string;
+  status: EquipmentStatus;
+  ownerId: string;
+  ownerName: string;
+  ownerEmail: string;
+};
