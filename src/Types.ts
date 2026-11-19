@@ -69,3 +69,40 @@ export type EquipmentPayload = {
   ownerName: string;
   ownerEmail: string;
 };
+
+/** Fields the owner can change from the My Equipment table (form values are text). */
+export type EquipmentEditValues = {
+  name: string;
+  description: string;
+  category: EquipmentCategory;
+  brand: string;
+  model: string;
+  condition: EquipmentCondition;
+  rentPrice: string;
+  rentalType: RentalType;
+  quantity: string;
+  location: string;
+  terms: string;
+};
+
+/** One equipment document returned by the backend. */
+export type Equipment = {
+  _id: string;
+  name: string;
+  description: string;
+  category: EquipmentCategory;
+  brand: string;
+  model: string;
+  condition: EquipmentCondition;
+  rentPrice: number;
+  rentalType: RentalType;
+  quantity: number;
+  location: string;
+  image: string;
+  terms: string;
+  status: EquipmentStatus;
+  ownerId: string;
+  ownerName: string;
+  ownerEmail: string;
+  createdAt: string;
+};
