@@ -27,6 +27,7 @@ type NavUser = {
   name: string;
   email: string;
   image?: string | null;
+  role: "customer" | "admin" | "owner";
 };
 
 function Avatar({ user, size = 32 }: { user: NavUser; size?: number }) {
@@ -135,7 +136,7 @@ const Navbar = () => {
 
                     <div className="p-2">
                       <Link
-                        href="/dashboard"
+                        href={`/dashboard/${user.role}`}
                         onClick={() => setMenuOpen(false)}
                         className="flex items-center gap-3 rounded-[10px] px-3 py-2 text-sm text-[#d4d4d8] transition hover:bg-white/5 hover:text-white"
                       >
@@ -199,7 +200,7 @@ const Navbar = () => {
 
                   <div className="mt-3 flex flex-col gap-1 border-t border-white/10 pt-2">
                     <Link
-                      href="/dashboard"
+                      href={`/dashboard/${user.role}`}
                       onClick={() => setOpen(false)}
                       className="flex items-center gap-2 rounded-[10px] px-2 py-2 text-sm text-white hover:bg-white/5"
                     >
