@@ -14,10 +14,23 @@ export const auth = betterAuth({
        additionalFields: {
           role: {
               type: ["customer", "admin",'owner'],
-              input: false,
+              // input: true lets the register form send a role.
+              input: true,
               defaultValue: "customer",
             } 
         }
+    },
+    // A new user can only become "customer" or "owner".
+    // If someone sends "admin", we save "customer" instead.
+    databaseHooks: {
+      user: {
+        create: {
+          before: async (user) => {
+            const role = user.role === "owner" ? "owner" : "customer";
+            return { data: { ...user, role } };
+          },
+        },
+      },
     },
 socialProviders: {
         google: { 

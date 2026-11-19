@@ -18,6 +18,9 @@ export type DashboardNavItem = {
   icon: LucideIcon;
 };
 
+/** Roles a new user can pick on the register page. */
+export type SignupRole = "customer" | "owner";
+
 /** Options for the equipment listing form. */
 export type EquipmentCondition = "New" | "Like New" | "Good" | "Fair";
 export type RentalType = "Daily" | "Weekly" | "Monthly";

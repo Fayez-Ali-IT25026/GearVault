@@ -12,11 +12,13 @@ import {
   EyeOff,
   ImagePlus,
   ArrowRight,
+  Briefcase,
   CheckCircle2,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/toast";
+import type { SignupRole } from "@/Types";
 
 
 
@@ -33,6 +35,9 @@ export default function RegisterPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
+  // "customer" or "owner". This is saved in the user document.
+  const [role, setRole] = useState<SignupRole>("customer");
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
@@ -41,23 +46,15 @@ export default function RegisterPage() {
     const form = e.currentTarget;
     const result = new FormData(form);
 
- const name = result.get("name") as string;
+    const name = result.get("name") as string;
     const email = result.get("email") as string;
     const image = result.get("image") as string;
     const password = result.get("password") as string;
     const confirmPassword = result.get("confirmPassword") as string;
+    // The hidden input keeps the selected role inside the form.
+    const selectedRole = result.get("role") as SignupRole;
 
-
-
-const { error: signUpError } = await authClient.signUp.email({
-    name: name, // required, The name of the user.
-    email: email, // required, The email address of the user.
-    password: password, // required, The password of the user. It should be at least 8 characters long and max 128 by default.
-    image: image, // An optional profile image of the user.
-    callbackURL: '/login', // An optional URL to redirect to after the user signs up.
-});
-
-
+    // 1. Check the form first.
     if (!name || !email || !password || !confirmPassword) {
       setError("Please fill in all required fields.");
       toast.error("Missing details", "Please fill in all required fields.");
@@ -76,6 +73,16 @@ const { error: signUpError } = await authClient.signUp.email({
       return;
     }
 
+    // 2. Only then create the account.
+    const { error: signUpError } = await authClient.signUp.email({
+      name: name, // required, The name of the user.
+      email: email, // required, The email address of the user.
+      password: password, // required, The password of the user.
+      image: image, // An optional profile image of the user.
+      role: selectedRole, // "customer" or "owner" - saved in the database.
+      callbackURL: '/login', // An optional URL to redirect to after the user signs up.
+    });
+
     if (signUpError) {
       const message = signUpError.message || "Unable to create your account.";
       setError(message);
@@ -83,13 +90,11 @@ const { error: signUpError } = await authClient.signUp.email({
       return;
     }
 
-    setSuccess("Form validated successfully! Connect your authentication next.");
+    setSuccess("Account created! You can now sign in.");
     toast.success("Account created!", "You can now sign in with your email.");
-    
 
-         router.push("/login");
-          router.refresh();
-
+    router.push("/login");
+    router.refresh();
   };
 
   const inputClass =
@@ -193,6 +198,54 @@ const handelGoogleRegister = async () => {
                   autoComplete="email"
                   className={inputClass}
                 />
+              </div>
+            </div>
+
+            {/* Role */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                I want to join as
+              </label>
+
+              {/* This hidden input sends the selected role with the form. */}
+              <input type="hidden" name="role" value={role} />
+
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => setRole("customer")}
+                  className={`flex items-center gap-2 rounded-xl border p-3 text-left text-sm font-medium transition-all duration-200 ${
+                    role === "customer"
+                      ? "border-blue-500 bg-blue-500/10 text-white"
+                      : "border-white/10 bg-white/[0.02] text-gray-400 hover:border-white/20"
+                  }`}
+                >
+                  <User className="w-4 h-4 shrink-0" />
+                  <span>
+                    Customer
+                    <span className="block text-xs font-normal text-gray-500">
+                      Rent equipment
+                    </span>
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setRole("owner")}
+                  className={`flex items-center gap-2 rounded-xl border p-3 text-left text-sm font-medium transition-all duration-200 ${
+                    role === "owner"
+                      ? "border-blue-500 bg-blue-500/10 text-white"
+                      : "border-white/10 bg-white/[0.02] text-gray-400 hover:border-white/20"
+                  }`}
+                >
+                  <Briefcase className="w-4 h-4 shrink-0" />
+                  <span>
+                    Equipment Owner
+                    <span className="block text-xs font-normal text-gray-500">
+                      List equipment
+                    </span>
+                  </span>
+                </button>
               </div>
             </div>
 
