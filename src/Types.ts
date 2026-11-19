@@ -24,7 +24,7 @@ export type SignupRole = "customer" | "owner";
 /** Options for the equipment listing form. */
 export type EquipmentCondition = "New" | "Like New" | "Good" | "Fair";
 export type RentalType = "Daily" | "Weekly" | "Monthly";
-export type EquipmentStatus = "Pending" | "Approved" | "Rejected";
+export type EquipmentStatus = "Pending" | "Approved" | "Rejected" | "Available";
 
 export type EquipmentCategory =
   | "Construction Equipment"

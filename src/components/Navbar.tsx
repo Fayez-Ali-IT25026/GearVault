@@ -17,7 +17,7 @@ import { toast } from "@/components/ui/toast";
 
 const links = [
   { name: "Home", href: "/" },
-  { name: "All Equipment", href: "/equipment" },
+  { name: "All Equipment", href: "/all-equipment" },
   { name: "How It Works", href: "/#how-it-works" },
   { name: "About Us", href: "/about" },
   { name: "Contact Us", href: "/contact" },
