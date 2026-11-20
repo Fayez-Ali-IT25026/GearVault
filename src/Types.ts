@@ -154,3 +154,27 @@ export type Rental = {
   equipmentCategory: string;
   equipmentLocation: string;
 };
+
+/** One rental document returned by the owner-rentals endpoint.
+ * Includes customer details and equipment image. */
+export type OwnerRental = {
+  _id: string;
+  equipmentId: string;
+  equipmentName: string;
+  ownerId: string;
+  ownerEmail: string;
+  customerEmail: string;
+  customerName: string;
+  customerImage: string | null;
+  equipmentImage: string | null;
+  startDate: string;
+  endDate: string;
+  quantity: number;
+  contact: string;
+  address: string;
+  notes: string;
+  totalAmount: number;
+  status: string;
+  paymentStatus: string;
+  createdAt: string;
+};
