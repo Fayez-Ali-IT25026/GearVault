@@ -2,7 +2,9 @@
 
 
 
-export async function getAllUsers(): Promise<TAdminUser[]> {
+import type { User } from "@/Types";
+
+export async function getAllUsers(): Promise<User[]> {
 //   const jwtToken = await auth.api.getToken({ headers: await headers() });
 //   if (!jwtToken) {
 //     throw new Error("No token found. User must be logged in to fetch users.");
@@ -23,5 +25,5 @@ export async function getAllUsers(): Promise<TAdminUser[]> {
   }
 
   const body = await res.json();
-  return body.data ?? [];
+  return Array.isArray(body) ? body : body.users ?? [];
 }

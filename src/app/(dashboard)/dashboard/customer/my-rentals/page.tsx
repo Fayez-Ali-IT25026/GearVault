@@ -53,6 +53,7 @@ export default function MyRentalsPage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [reloadKey, setReloadKey] = useState(0);
 
   // Fetch rentals from the backend
   useEffect(() => {
@@ -61,7 +62,7 @@ export default function MyRentalsPage() {
     async function fetchRentals() {
       try {
         const response = await fetch(
-          `${API_BASE_URL}/my-rentals?email=${session.user.email}`
+          `${API_BASE_URL}/my-rentals?email=${session?.user?.email}`
         );
         if (!response.ok) throw new Error();
 
@@ -76,7 +77,7 @@ export default function MyRentalsPage() {
     }
 
     fetchRentals();
-  }, [session?.user?.email]);
+  }, [session?.user?.email, reloadKey]);
 
   if (isPending) {
     return (
@@ -153,7 +154,8 @@ export default function MyRentalsPage() {
             type="button"
             onClick={() => {
               setError("");
-              fetchRentals();
+              setLoading(true);
+              setReloadKey((key) => key + 1);
             }}
             className="w-fit rounded-[10x] border border-red-500/30 px-3 py-1.5 text-xs font-medium text-red-200 transition-colors hover:bg-red-500/20"
           >

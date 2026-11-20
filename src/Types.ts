@@ -21,6 +21,18 @@ export type DashboardNavItem = {
 /** Roles a new user can pick on the register page. */
 export type SignupRole = "customer" | "owner";
 
+/** One user document returned by the backend GET /users endpoint. */
+export type User = {
+  _id: string;
+  name: string;
+  email: string;
+  emailVerified: boolean;
+  image?: string | null;
+  role?: UserRole | null;
+  createdAt: string;
+  updatedAt: string;
+};
+
 /** Options for the equipment listing form. */
 export type EquipmentCondition = "New" | "Like New" | "Good" | "Fair";
 export type RentalType = "Daily" | "Weekly" | "Monthly";
