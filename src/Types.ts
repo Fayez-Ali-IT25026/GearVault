@@ -118,3 +118,27 @@ export type BookingPayload = {
   address: string;
   notes?: string;
 };
+
+/** One rental/booking document returned by the my-rentals endpoint.
+ * Joins booking fields with equipment details for the dashboard view. */
+export type Rental = {
+  _id: string;
+  equipmentId: string;
+  equipmentName: string;
+  ownerId: string;
+  ownerEmail: string;
+  customerEmail: string;
+  startDate: string;
+  endDate: string;
+  quantity: number;
+  contact: string;
+  address: string;
+  notes: string;
+  totalAmount: number;
+  status: string;
+  paymentStatus: string;
+  createdAt: string;
+  equipmentImage: string;
+  equipmentCategory: string;
+  equipmentLocation: string;
+};
