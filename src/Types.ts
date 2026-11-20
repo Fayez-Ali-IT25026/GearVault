@@ -106,3 +106,14 @@ export type Equipment = {
   ownerEmail: string;
   createdAt: string;
 };
+
+/** The JSON body sent to the backend POST /bookings endpoint. */
+export type BookingPayload = {
+  equipmentId: string;
+  startDate: string; // "2026-11-25"
+  endDate: string;
+  quantity: number;
+  contact: string;
+  address: string;
+  notes?: string;
+};

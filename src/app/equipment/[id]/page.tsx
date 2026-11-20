@@ -271,7 +271,7 @@ const EquipmentDetailsPage = () => {
 
                 <div className="mt-6 flex items-end justify-between border-t border-white/10 pt-6">
                   <p className="text-4xl font-extrabold text-[#3b82f6]">
-                    ${item.rentPrice}
+                    ৳{item.rentPrice}
                     <span className="ml-1 text-base font-normal text-[#a1a1aa]">/ {item.rentalType}</span>
                   </p>
                   <span
@@ -405,12 +405,12 @@ const EquipmentDetailsPage = () => {
               <div className="mt-2 flex justify-between text-[#a1a1aa]">
                 <span>Rate × quantity</span>
                 <span className="text-white">
-                  ${item.rentPrice} / {item.rentalType} × {form.quantity}
+                  ৳{item.rentPrice} / {item.rentalType} × {form.quantity}
                 </span>
               </div>
               <div className="mt-3 flex justify-between border-t border-white/10 pt-3 text-base font-bold text-white">
                 <span>Total</span>
-                <span className="text-[#3b82f6]">${total}</span>
+                <span className="text-[#3b82f6]">৳{total}</span>
               </div>
             </div>
 
