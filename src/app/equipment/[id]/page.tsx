@@ -43,6 +43,7 @@ const EquipmentDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { data: session } = authClient.useSession();
+  const isCustomer = session?.user?.role === "customer";
 
   const [item, setItem] = useState<Equipment | null>(null);
   const [loading, setLoading] = useState(true);
@@ -67,6 +68,17 @@ const EquipmentDetailsPage = () => {
         const res = await fetch(`${API_BASE_URL}/equipment/${id}`);
         if (!res.ok) throw new Error("not found");
         setItem(await res.json());
+
+        // Check if favorited (only for customers)
+        if (session?.user?.email && session?.user?.role === "customer") {
+          const favRes = await fetch(
+            `${API_BASE_URL}/favorites/check?equipmentId=${id}&email=${session.user.email}`
+          );
+          if (favRes.ok) {
+            const favData = await favRes.json();
+            setIsFav(favData.isFav);
+          }
+        }
       } catch {
         setNotFound(true);
       } finally {
@@ -74,7 +86,7 @@ const EquipmentDetailsPage = () => {
       }
     };
     load();
-  }, [id]);
+  }, [id, session?.user?.email, session?.user?.role]);
 
   /* ---------- total price calculation ---------- */
   const { days, total } = useMemo(() => {
@@ -94,7 +106,7 @@ const EquipmentDetailsPage = () => {
 
   /* ---------- favorites ---------- */
   const toggleFavorite = async () => {
-    if (!session?.user || !item) return;
+    if (!session?.user || !item || session.user.role !== "customer") return;
     try {
       const res = await fetch(`${API_BASE_URL}/favorites`, {
         method: isFav ? "DELETE" : "POST",
@@ -259,13 +271,15 @@ const EquipmentDetailsPage = () => {
               <div className="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur">
                 <div className="flex items-start justify-between gap-3">
                   <h1 className="text-2xl font-bold leading-tight text-white sm:text-3xl">{item.name}</h1>
-                  <button
-                    onClick={toggleFavorite}
-                    aria-label="Toggle favorite"
-                    className="rounded-full border border-white/10 bg-white/5 p-2.5 transition hover:border-[#ef4444]/50"
-                  >
-                    <Heart className={`h-5 w-5 ${isFav ? "fill-[#ef4444] text-[#ef4444]" : "text-white"}`} />
-                  </button>
+                  {isCustomer && (
+                    <button
+                      onClick={toggleFavorite}
+                      aria-label="Toggle favorite"
+                      className="rounded-full border border-white/10 bg-white/5 p-2.5 transition hover:border-[#ef4444]/50"
+                    >
+                      <Heart className={`h-5 w-5 ${isFav ? "fill-[#ef4444] text-[#ef4444]" : "text-white"}`} />
+                    </button>
+                  )}
                 </div>
 
                 <p className="mt-2 flex items-center gap-1.5 text-sm text-[#a1a1aa]">
@@ -286,14 +300,22 @@ const EquipmentDetailsPage = () => {
                   </span>
                 </div>
 
-                <button
-                  disabled={!available}
-                  onClick={() => setOpen(true)}
-                  className="mt-6 w-full rounded-xl bg-[#3b82f6] py-3.5 font-semibold text-white shadow-[0_0_30px_rgba(59,130,246,0.35)] transition hover:bg-[#2563eb] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
-                >
-                  Book Now
-                </button>
-                <p className="mt-3 text-center text-xs text-[#71717a]">Secure payment with Stripe</p>
+                {isCustomer ? (
+                  <>
+                    <button
+                      disabled={!available}
+                      onClick={() => setOpen(true)}
+                      className="mt-6 w-full rounded-xl bg-[#3b82f6] py-3.5 font-semibold text-white shadow-[0_0_30px_rgba(59,130,246,0.35)] transition hover:bg-[#2563eb] disabled:cursor-not-allowed disabled:opacity-50 disabled:shadow-none"
+                    >
+                      Book Now
+                    </button>
+                    <p className="mt-3 text-center text-xs text-[#71717a]">Secure payment with Stripe</p>
+                  </>
+                ) : (
+                  <p className="mt-6 text-center text-sm text-[#71717a]">
+                    {session ? "Only customers can book equipment." : "Please log in to book this equipment."}
+                  </p>
+                )}
               </div>
 
               {/* owner */}
