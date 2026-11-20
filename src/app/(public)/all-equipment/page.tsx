@@ -58,7 +58,7 @@ const emptyFilters: Filters = {
   condition: "",
   rentalType: "",
   location: "",
-  status: "Available",
+  status: "Approved,Available",
   minPrice: "",
   maxPrice: "",
 };
@@ -314,7 +314,7 @@ export default function AllEquipmentPage() {
               aria-label="Filter by status"
               className={inputClass}
             >
-              <option value="Available">Available</option>
+              <option value="Approved,Available">Available</option>
               <option value="">All statuses</option>
             </select>
 
