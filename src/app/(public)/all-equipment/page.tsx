@@ -9,25 +9,33 @@ import {
   Search,
   X,
 } from "lucide-react";
-import type {
-  Equipment,
-  EquipmentCategory,
-  EquipmentCondition,
-  RentalType,
-} from "@/Types";
+import type { Equipment, RentalType } from "@/Types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
-const categories: EquipmentCategory[] = [
+// The first 6 are the options in the "Add Equipment" form.
+// The rest are categories that equipment in the database already uses.
+const categories: string[] = [
   "Construction Equipment",
   "Photography Equipment",
   "Vehicles & Transportation",
   "Agriculture Equipment",
   "Electronics",
   "Event Equipment",
+  "Camera",
+  "Camera Accessories",
+  "Camera Lens",
+  "Drone",
+  "Laptop",
+  "Monitor",
+  "Projector",
+  "Audio Equipment",
+  "Lighting",
+  "Speaker",
+  "Tablet",
 ];
 
-const conditions: EquipmentCondition[] = ["New", "Like New", "Good", "Fair"];
+const conditions: string[] = ["New", "Like New", "Excellent", "Good", "Fair"];
 const rentalTypes: RentalType[] = ["Daily", "Weekly", "Monthly"];
 
 // Common locations, shown as suggestions while typing.
