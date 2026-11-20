@@ -1,5 +1,5 @@
 
-import { BookingPayload } from "@/Types";
+import type { BookingPayload } from "@/Types";
 
 
 
@@ -28,7 +28,7 @@ export async function createBooking(payload: BookingPayload, ) {
     }
 
     return await res.json(); // { success, data: { redirectUrl } }
-  } catch (err: any) {
+  } catch (err) {
     console.error("createBooking failed:", err);
     throw err;
   }

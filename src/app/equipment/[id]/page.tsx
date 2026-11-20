@@ -20,6 +20,7 @@ import {
   Wrench,
 } from "lucide-react";
 import type { Equipment } from "@/Types";
+import { createBooking } from "@/lib/actions/booking";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@/components/ui/toast";
 import {
@@ -114,7 +115,11 @@ const EquipmentDetailsPage = () => {
   /* ---------- booking -> payment ---------- */
   const handleBooking = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!item || !session?.user) return;
+    if (!item) return;
+
+    if (!session?.user) {
+      return toast.error("Please login", "You need an account to book this equipment.");
+    }
 
     if (days < 1) return toast.error("Invalid dates", "End date must be after start date.");
     if (form.quantity > item.quantity)
@@ -122,23 +127,21 @@ const EquipmentDetailsPage = () => {
 
     setSubmitting(true);
     try {
-      // Backend should check availability and return a Stripe Checkout URL
-      const res = await fetch(`${API_BASE_URL}/create-checkout-session`, {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          equipmentId: item._id,
-          equipmentName: item.name,
-          ownerEmail: item.ownerEmail,
-          customerName: session.user.name,
-          customerEmail: session.user.email,
-          ...form,
-          totalAmount: total,
-        }),
+      // The backend creates the booking and returns a Stripe Checkout link.
+      const res = await createBooking({
+        equipmentId: item._id,
+        customerEmail: session.user.email,
+        startDate: form.startDate,
+        endDate: form.endDate,
+        quantity: form.quantity,
+        contact: form.phone,
+        address: form.address,
+        notes: form.notes,
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "Booking failed");
-      window.location.href = data.url;
+
+      // Send the user to Stripe to pay.
+      window.location.href = res.data.redirectUrl;
+      setSubmitting(false);
     } catch (err) {
       toast.error("Booking failed", err instanceof Error ? err.message : "Try again.");
       setSubmitting(false);

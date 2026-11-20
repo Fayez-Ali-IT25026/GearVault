@@ -107,9 +107,10 @@ export type Equipment = {
   createdAt: string;
 };
 
-/** The JSON body sent to the backend POST /bookings endpoint. */
+/** The JSON body sent to the backend POST /create-checkout-session. */
 export type BookingPayload = {
   equipmentId: string;
+  customerEmail: string;
   startDate: string; // "2026-11-25"
   endDate: string;
   quantity: number;
