@@ -29,7 +29,7 @@ export default function AdminEquipmentPage() {
   useEffect(() => {
     async function loadEquipment() {
       try {
-        const response = await authFetch(`${API_BASE_URL}/equipment`);
+        const response = await authFetch(`${API_BASE_URL}/equipment?status=Approved,Pending,Rejected`);
         if (!response.ok) throw new Error();
         const data: Equipment[] = await response.json();
         setEquipment(data);

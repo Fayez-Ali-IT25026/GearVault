@@ -29,11 +29,12 @@ export default function FavoritesPage() {
   // Load favorites from backend
   useEffect(() => {
     if (!session?.user?.email) return;
+    const email = session.user.email;
 
     async function loadFavorites() {
       try {
         const res = await authFetch(
-          `${API_BASE_URL}/favorites?email=${session.user.email}`
+          `${API_BASE_URL}/favorites?email=${email}`
         );
         if (!res.ok) throw new Error();
         const data: Equipment[] = await res.json();

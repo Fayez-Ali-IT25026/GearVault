@@ -43,7 +43,7 @@ const inputCls =
 const EquipmentDetailsPage = () => {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
   const isCustomer = session?.user?.role === "customer";
 
   const [item, setItem] = useState<Equipment | null>(null);
@@ -62,8 +62,21 @@ const EquipmentDetailsPage = () => {
     notes: "",
   });
 
+  /* ---------- guests must log in ---------- */
+  useEffect(() => {
+    if (!isPending && !session) {
+      router.replace("/login");
+    }
+  }, [isPending, session, router]);
+
   /* ---------- load equipment ---------- */
   useEffect(() => {
+    // Wait until the session is known and the user is logged in.
+    if (isPending || !session?.user?.email) return;
+
+    const email = session.user.email;
+    const role = session.user.role;
+
     const load = async () => {
       try {
         const res = await authFetch(`${API_BASE_URL}/equipment/${id}`);
@@ -71,9 +84,9 @@ const EquipmentDetailsPage = () => {
         setItem(await res.json());
 
         // Check if favorited (only for customers)
-        if (session?.user?.email && session?.user?.role === "customer") {
+        if (role === "customer") {
           const favRes = await authFetch(
-            `${API_BASE_URL}/favorites/check?equipmentId=${id}&email=${session.user.email}`
+            `${API_BASE_URL}/favorites/check?equipmentId=${id}&email=${email}`
           );
           if (favRes.ok) {
             const favData = await favRes.json();
@@ -87,7 +100,7 @@ const EquipmentDetailsPage = () => {
       }
     };
     load();
-  }, [id, session?.user?.email, session?.user?.role]);
+  }, [id, isPending, session?.user?.email, session?.user?.role]);
 
   /* ---------- total price calculation ---------- */
   const { days, total } = useMemo(() => {
@@ -162,7 +175,8 @@ const EquipmentDetailsPage = () => {
   };
 
   /* ---------- loading / not found ---------- */
-  if (loading)
+  // Wait until we know who the user is (no flash of the page or "not found").
+  if (isPending || loading)
     return (
       <div className="mx-auto max-w-7xl animate-pulse px-4 py-28">
         <div className="grid gap-10 lg:grid-cols-5">
@@ -175,6 +189,9 @@ const EquipmentDetailsPage = () => {
         </div>
       </div>
     );
+
+  // A guest is being redirected to /login.
+  if (!session) return null;
 
   if (notFound || !item)
     return (

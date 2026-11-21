@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, type ReactNode } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import DashboardSidebar from "@/components/DashboardSidebar";
 import {
@@ -12,14 +12,24 @@ import {
 
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: session, isPending } = authClient.useSession();
+
+  const role = session?.user?.role ?? "customer";
 
   // Guests are sent to the login page.
   useEffect(() => {
-    if (!isPending && !session) {
+    if (isPending) return;
+    if (!session) {
       router.replace("/login");
+      return;
     }
-  }, [isPending, session, router]);
+
+    // Role guard: only allow access to /dashboard/{role}
+    if (pathname.startsWith("/dashboard/") && !pathname.startsWith(`/dashboard/${role}`)) {
+      router.replace(`/dashboard/${role}`);
+    }
+  }, [isPending, session, pathname, role, router]);
 
   if (isPending) {
     return (
@@ -30,6 +40,11 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
   }
 
   if (!session) {
+    return null;
+  }
+
+  // Don't render children until the role check passes
+  if (pathname.startsWith("/dashboard/") && !pathname.startsWith(`/dashboard/${role}`)) {
     return null;
   }
 

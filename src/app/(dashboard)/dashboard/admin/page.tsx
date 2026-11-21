@@ -24,7 +24,7 @@ import {
   YAxis,
 } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import type { User, Equipment, AdminRental, DashboardStats } from "@/Types";
+import type { AdminRental, DashboardStats } from "@/Types";
 import { authFetch } from "@/lib/api/authFetch";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
@@ -32,27 +32,21 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 export default function AdminDashboardPage() {
   const { data: session, isPending } = authClient.useSession();
 
-  const [users, setUsers] = useState<User[]>([]);
-  const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [rentals, setRentals] = useState<AdminRental[]>([]);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  // Load all data
+  // Load the rental list (for the "Recent Rentals" table) and the totals.
   useEffect(() => {
     async function loadAll() {
       try {
-        const [usersRes, equipRes, rentalsRes, statsRes] = await Promise.all([
-          authFetch(`${API_BASE_URL}/users`),
-          authFetch(`${API_BASE_URL}/equipment`),
+        const [rentalsRes, statsRes] = await Promise.all([
           authFetch(`${API_BASE_URL}/rentals`),
           authFetch(`${API_BASE_URL}/admin-stats`),
         ]);
-        if (!usersRes.ok || !equipRes.ok || !rentalsRes.ok || !statsRes.ok) throw new Error();
+        if (!rentalsRes.ok || !statsRes.ok) throw new Error();
 
-        setUsers(await usersRes.json());
-        setEquipment(await equipRes.json());
         setRentals(await rentalsRes.json());
         setStats(await statsRes.json());
         setError("");
@@ -78,14 +72,13 @@ export default function AdminDashboardPage() {
     return null;
   }
 
-  // Computed stats
-  const totalUsers = users.length;
-  const totalEquipment = equipment.length;
-  const totalRentals = rentals.length;
-  const pendingEquipment = equipment.filter((e) => e.status === "Pending").length;
-  const totalRevenue = rentals
-    .filter((r) => r.paymentStatus === "paid")
-    .reduce((sum, r) => sum + r.totalAmount, 0);
+  // Totals come from the backend, so we don't count the lists here.
+  const totalUsers = stats?.totalUsers ?? 0;
+  const totalEquipment = stats?.totalEquipment ?? 0;
+  const totalBookings = stats?.totalBookings ?? 0;
+  const pendingApprovals = stats?.pendingApprovals ?? 0;
+  const completedRentals = stats?.completedRentals ?? 0;
+  const totalRevenue = stats?.totalRevenue ?? 0;
   const recentRentals = rentals.slice(0, 5);
 
   const statCards = [
@@ -108,8 +101,8 @@ export default function AdminDashboardPage() {
       href: "/dashboard/admin/equipment",
     },
     {
-      label: "Total Rentals",
-      value: totalRentals,
+      label: "Total Bookings",
+      value: totalBookings,
       icon: ClipboardList,
       color: "text-green-400",
       bg: "bg-green-500/10",
@@ -117,13 +110,31 @@ export default function AdminDashboardPage() {
       href: "/dashboard/admin/rentals",
     },
     {
-      label: "Pending Approval",
-      value: pendingEquipment,
+      label: "Pending Approvals",
+      value: pendingApprovals,
       icon: Clock,
       color: "text-amber-400",
       bg: "bg-amber-500/10",
       border: "border-amber-500/20",
       href: "/dashboard/admin/equipment",
+    },
+    {
+      label: "Completed Rentals",
+      value: completedRentals,
+      icon: CheckCircle2,
+      color: "text-cyan-400",
+      bg: "bg-cyan-500/10",
+      border: "border-cyan-500/20",
+      href: "/dashboard/admin/rentals",
+    },
+    {
+      label: "Total Revenue",
+      value: `৳${totalRevenue.toLocaleString()}`,
+      icon: DollarSign,
+      color: "text-emerald-400",
+      bg: "bg-emerald-500/10",
+      border: "border-emerald-500/20",
+      href: "/dashboard/admin/rentals",
     },
   ];
 
@@ -157,7 +168,7 @@ export default function AdminDashboardPage() {
       )}
 
       {/* Stats cards */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {statCards.map((stat) => (
           <Link
             key={stat.label}
@@ -174,21 +185,6 @@ export default function AdminDashboardPage() {
             <p className="mt-1 text-sm text-[#a1a1aa]">{stat.label}</p>
           </Link>
         ))}
-      </div>
-
-      {/* Revenue card */}
-      <div className="rounded-[16px] border border-emerald-500/20 bg-[#0f1016] p-5">
-        <div className="flex items-center gap-3">
-          <div className="flex size-10 items-center justify-center rounded-[10px] bg-emerald-500/10">
-            <DollarSign className="size-5 text-emerald-400" />
-          </div>
-          <div>
-            <p className="text-3xl font-bold text-white">
-              ৳{totalRevenue.toLocaleString()}
-            </p>
-            <p className="text-sm text-[#a1a1aa]">Total Revenue (paid bookings)</p>
-          </div>
-        </div>
       </div>
 
       {/* Charts */}

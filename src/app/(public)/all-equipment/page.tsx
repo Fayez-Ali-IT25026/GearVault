@@ -56,7 +56,7 @@ type Filters = {
   condition: string;
   rentalType: string;
   location: string;
-  status: string;
+  availability: string;
   minPrice: string;
   maxPrice: string;
 };
@@ -66,7 +66,7 @@ const emptyFilters: Filters = {
   condition: "",
   rentalType: "",
   location: "",
-  status: "Approved,Available",
+  availability: "",
   minPrice: "",
   maxPrice: "",
 };
@@ -174,8 +174,11 @@ export default function AllEquipmentPage() {
         // Sort order
         if (sort) params.set("sort", sort);
 
-        // Only show items that are marked Available (unless "All statuses" is picked).
-        if (filters.status) params.set("status", filters.status);
+        // Only approved equipment is shown on the public page.
+        params.set("status", "Approved");
+
+        // Only items that are in stock.
+        if (filters.availability === "in_stock") params.set("available", "true");
 
         const response = await fetch(
           `${API_BASE_URL}/equipment?${params.toString()}`
@@ -321,13 +324,15 @@ export default function AllEquipmentPage() {
             />
 
             <select
-              value={filters.status}
-              onChange={(event) => updateFilter("status", event.target.value)}
-              aria-label="Filter by status"
+              value={filters.availability}
+              onChange={(event) =>
+                updateFilter("availability", event.target.value)
+              }
+              aria-label="Filter by availability"
               className={inputClass}
             >
-              <option value="Approved,Available">Available</option>
-              <option value="">All statuses</option>
+              <option value="">All availability</option>
+              <option value="in_stock">In stock</option>
             </select>
 
             <select

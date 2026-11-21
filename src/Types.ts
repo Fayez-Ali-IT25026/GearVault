@@ -217,4 +217,12 @@ export type DashboardStats = {
   monthlyBookings: MonthlyStat[];
   monthlyEarnings: MonthlyStat[];
   pendingApprovals: number;
+  // Admin totals
+  totalUsers?: number;
+  totalEquipment?: number;
+  totalBookings?: number;
+  completedRentals?: number;
+  totalRevenue?: number;
+  // Owner totals
+  totalEarnings?: number;
 };

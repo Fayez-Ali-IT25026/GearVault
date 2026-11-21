@@ -117,7 +117,7 @@ export default function MyEquipmentPage() {
     async function loadEquipment() {
       try {
         const response = await authFetch(
-          `${API_BASE_URL}/equipment?ownerId=${ownerId}`
+          `${API_BASE_URL}/equipment?ownerId=${ownerId}&status=Approved,Pending,Rejected`
         );
         if (!response.ok) throw new Error();
 
