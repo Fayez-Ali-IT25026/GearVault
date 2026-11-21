@@ -14,13 +14,11 @@ import {
   LogIn,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
 import { toast } from "@/components/ui/toast";
 
 
 
 export default function LoginPage() {
-    const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -61,8 +59,6 @@ export default function LoginPage() {
 
     setSuccess("Form validated successfully! ");
     toast.success("Welcome back!", "You are now signed in.");
-       router.push("/");
-      router.refresh();
   };
 
   const inputClass =

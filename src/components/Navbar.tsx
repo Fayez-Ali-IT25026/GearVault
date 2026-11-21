@@ -76,14 +76,14 @@ const Navbar = () => {
     setOpen(false);
     toast.success("Signed out", "You have been logged out successfully.");
 
-    router.push("/");
+    router.push("/login");
     router.refresh();
   };
 
   return (
     <header className="sticky top-0 z-50 border-b border-white/10 bg-[#09090b]/80 backdrop-blur">
       <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
-        <Link href="/" className="flex items-center gap-2 font-[var(--font-manrope)] text-xl font-bold">
+        <Link href="/login" className="flex items-center gap-2 font-[var(--font-manrope)] text-xl font-bold">
           <ShieldCheck className="h-6 w-6 text-[#3b82f6]" />
           <span className="text-white">Gear<span className="text-[#3b82f6]">Vault</span></span>
         </Link>

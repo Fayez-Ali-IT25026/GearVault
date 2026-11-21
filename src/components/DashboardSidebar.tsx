@@ -90,7 +90,7 @@ export default function DashboardSidebar({ user }: { user: DashboardUser }) {
     clearToken();
     await authClient.signOut();
     toast.success("Signed out", "See you next time!");
-    router.push("/");
+    router.push("/login");
     router.refresh();
   };
 
@@ -102,7 +102,7 @@ export default function DashboardSidebar({ user }: { user: DashboardUser }) {
       {/* Brand */}
       <SidebarHeader className="border-b border-white/10 p-2">
         <Link
-          href="/"
+          href="/login"
           onClick={closeOnMobile}
           className="flex h-10 items-center gap-3 rounded-[10px] px-1.5 transition-colors hover:bg-white/[0.04]"
         >
