@@ -87,7 +87,7 @@ export default function OwnerDashboardPage() {
     .reduce((sum, r) => sum + r.totalAmount, 0);
   const recentRentals = rentals.slice(0, 5);
 
-  const stats = [
+  const statCards = [
     {
       label: "My Equipment",
       value: totalEquipment,
@@ -157,7 +157,7 @@ export default function OwnerDashboardPage() {
 
       {/* Stats cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
+        {statCards.map((stat) => (
           <Link
             key={stat.label}
             href={stat.href}
