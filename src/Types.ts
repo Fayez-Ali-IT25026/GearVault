@@ -178,3 +178,28 @@ export type OwnerRental = {
   paymentStatus: string;
   createdAt: string;
 };
+
+/** One rental document returned by the admin /rentals endpoint.
+ * Includes customer, owner, and equipment details. */
+export type AdminRental = {
+  _id: string;
+  equipmentId: string;
+  equipmentName: string;
+  ownerId: string;
+  ownerEmail: string;
+  ownerName: string;
+  customerEmail: string;
+  customerName: string;
+  customerImage: string | null;
+  equipmentImage: string | null;
+  startDate: string;
+  endDate: string;
+  quantity: number;
+  contact: string;
+  address: string;
+  notes: string;
+  totalAmount: number;
+  status: string;
+  paymentStatus: string;
+  createdAt: string;
+};
