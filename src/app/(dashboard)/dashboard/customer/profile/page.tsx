@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@/components/ui/toast";
-import { Loader2, Pencil, Save, X, User, Mail, Shield, Calendar } from "lucide-react";
+import { Loader2, Pencil, Save, X, User, Mail, Shield, Calendar, Phone, MapPin } from "lucide-react";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -12,6 +12,8 @@ export default function CustomerProfilePage() {
 
   const [name, setName] = useState("");
   const [image, setImage] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -27,10 +29,14 @@ export default function CustomerProfilePage() {
         const data = await res.json();
         setName(data.name || "");
         setImage(data.image || "");
+        setPhone(data.phone || "");
+        setAddress(data.address || "");
       } catch {
         // Fall back to session data
         setName(session?.user?.name || "");
         setImage(session?.user?.image || "");
+        setPhone("");
+        setAddress("");
       } finally {
         setLoading(false);
       }
@@ -43,15 +49,17 @@ export default function CustomerProfilePage() {
     if (!session?.user?.id) return;
     setSaving(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/users/${session.user.id}`, {
+      const res = await fetch(`${API_BASE_URL}/users/${session?.user?.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, image }),
+        body: JSON.stringify({ name, image, phone, address }),
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
       setName(data.name || name);
       setImage(data.image || image);
+      setPhone(data.phone || phone);
+      setAddress(data.address || address);
       setEditing(false);
       toast.success("Profile updated", "Your changes were saved.");
     } catch {
@@ -66,6 +74,8 @@ export default function CustomerProfilePage() {
     // Reset to session data
     setName(session?.user?.name || "");
     setImage(session?.user?.image || "");
+    setPhone("");
+    setAddress("");
   }
 
   if (isPending || loading) {
@@ -177,6 +187,32 @@ export default function CustomerProfilePage() {
 
             <div>
               <label className="mb-1.5 block text-xs font-medium text-[#a1a1aa]">
+                Phone Number
+              </label>
+              <input
+                type="tel"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                className="w-full rounded-[10px] border border-white/10 bg-[#0c0d12] px-3 py-2.5 text-sm text-white placeholder:text-[#52525b] outline-none transition-colors focus:border-[#3b82f6] focus:ring-2 focus:ring-[#3b82f6]/20"
+                placeholder="01XXXXXXXXX"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-[#a1a1aa]">
+                Address
+              </label>
+              <textarea
+                rows={2}
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                className="w-full rounded-[10px] border border-white/10 bg-[#0c0d12] px-3 py-2.5 text-sm text-white placeholder:text-[#52525b] outline-none transition-colors focus:border-[#3b82f6] focus:ring-2 focus:ring-[#3b82f6]/20 resize-y"
+                placeholder="House, road, area, city"
+              />
+            </div>
+
+            <div>
+              <label className="mb-1.5 block text-xs font-medium text-[#a1a1aa]">
                 Email
               </label>
               <input
@@ -221,6 +257,8 @@ export default function CustomerProfilePage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <InfoItem icon={<User className="size-4" />} label="Full Name" value={name || user.name} />
             <InfoItem icon={<Mail className="size-4" />} label="Email" value={user.email} />
+            <InfoItem icon={<Phone className="size-4" />} label="Phone" value={phone || "Not set"} />
+            <InfoItem icon={<MapPin className="size-4" />} label="Address" value={address || "Not set"} />
             <InfoItem icon={<Shield className="size-4" />} label="Role" value="Customer" />
             <InfoItem icon={<Calendar className="size-4" />} label="Member Since" value={new Date(user.createdAt).toLocaleDateString()} />
           </div>

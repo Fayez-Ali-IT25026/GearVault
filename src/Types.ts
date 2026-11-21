@@ -29,6 +29,8 @@ export type User = {
   emailVerified: boolean;
   image?: string | null;
   role?: UserRole | null;
+  phone?: string | null;
+  address?: string | null;
   createdAt: string;
   updatedAt: string;
 };
