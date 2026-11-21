@@ -135,7 +135,7 @@ const EquipmentDetailsPage = () => {
 
     if (days < 1) return toast.error("Invalid dates", "End date must be after start date.");
     if (form.quantity > item.quantity)
-      return toast.error("Not enough stock", `Only ${item.quantity} available.`);
+      return toast.error("Not enough stock", `Only ${item.quantity} total available.`);
 
     setSubmitting(true);
     try {
