@@ -25,6 +25,7 @@ import {
 } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import type { Equipment, OwnerRental, DashboardStats } from "@/Types";
+import { authFetch } from "@/lib/api/authFetch";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -44,9 +45,9 @@ export default function OwnerDashboardPage() {
     async function loadAll() {
       try {
         const [equipRes, rentalsRes, statsRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/equipment?ownerId=${session?.user?.id}`),
-          fetch(`${API_BASE_URL}/owner-rentals?ownerId=${session?.user?.id}`),
-          fetch(`${API_BASE_URL}/owner-stats?ownerId=${session?.user?.id}`),
+          authFetch(`${API_BASE_URL}/equipment?ownerId=${session?.user?.id}`),
+          authFetch(`${API_BASE_URL}/owner-rentals?ownerId=${session?.user?.id}`),
+          authFetch(`${API_BASE_URL}/owner-stats?ownerId=${session?.user?.id}`),
         ]);
         if (!equipRes.ok || !rentalsRes.ok || !statsRes.ok) throw new Error();
 

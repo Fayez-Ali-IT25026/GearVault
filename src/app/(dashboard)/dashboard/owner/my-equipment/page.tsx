@@ -48,6 +48,7 @@ import type {
   EquipmentEditValues,
   RentalType,
 } from "@/Types";
+import { authFetch } from "@/lib/api/authFetch";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -115,7 +116,7 @@ export default function MyEquipmentPage() {
 
     async function loadEquipment() {
       try {
-        const response = await fetch(
+        const response = await authFetch(
           `${API_BASE_URL}/equipment?ownerId=${ownerId}`
         );
         if (!response.ok) throw new Error();
@@ -173,7 +174,7 @@ export default function MyEquipmentPage() {
 
     setSaving(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/equipment/${editingId}`, {
+      const response = await authFetch(`${API_BASE_URL}/equipment/${editingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updates),
@@ -204,7 +205,7 @@ export default function MyEquipmentPage() {
     const deleted = deleteTarget;
     setDeleting(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/equipment/${deleted._id}`, {
+      const response = await authFetch(`${API_BASE_URL}/equipment/${deleted._id}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error();

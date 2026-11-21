@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Loader2, Trash2, Users } from "lucide-react";
 import type { User } from "@/Types";
+import { authFetch } from "@/lib/api/authFetch";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -31,7 +32,7 @@ export default function AdminUsersPage() {
   useEffect(() => {
     async function loadUsers() {
       try {
-        const response = await fetch(`${API_BASE_URL}/users`);
+        const response = await authFetch(`${API_BASE_URL}/users`);
         if (!response.ok) throw new Error();
         const data: User[] = await response.json();
         setUsers(data);
@@ -49,7 +50,7 @@ export default function AdminUsersPage() {
   async function changeRole(userId: string, newRole: string) {
     setUpdatingId(userId);
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+      const response = await authFetch(`${API_BASE_URL}/users/${userId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ role: newRole }),
@@ -74,7 +75,7 @@ export default function AdminUsersPage() {
   async function deleteUser(userId: string) {
     setDeletingId(userId);
     try {
-      const response = await fetch(`${API_BASE_URL}/users/${userId}`, {
+      const response = await authFetch(`${API_BASE_URL}/users/${userId}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error();

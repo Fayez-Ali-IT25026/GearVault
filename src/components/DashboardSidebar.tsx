@@ -16,6 +16,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { clearToken } from "@/lib/api/authFetch";
 import { toast } from "@/components/ui/toast";
 import {
   Sidebar,
@@ -86,6 +87,7 @@ export default function DashboardSidebar({ user }: { user: DashboardUser }) {
   };
 
   const handleSignOut = async () => {
+    clearToken();
     await authClient.signOut();
     toast.success("Signed out", "See you next time!");
     router.push("/");

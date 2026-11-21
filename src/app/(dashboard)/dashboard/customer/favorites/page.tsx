@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/table";
 import { Loader2, Heart, Trash2, Package, MapPin } from "lucide-react";
 import type { Equipment } from "@/Types";
+import { authFetch } from "@/lib/api/authFetch";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -31,7 +32,7 @@ export default function FavoritesPage() {
 
     async function loadFavorites() {
       try {
-        const res = await fetch(
+        const res = await authFetch(
           `${API_BASE_URL}/favorites?email=${session.user.email}`
         );
         if (!res.ok) throw new Error();
@@ -52,7 +53,7 @@ export default function FavoritesPage() {
     if (!session?.user?.email) return;
     setRemovingId(equipmentId);
     try {
-      const res = await fetch(`${API_BASE_URL}/favorites`, {
+      const res = await authFetch(`${API_BASE_URL}/favorites`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -22,6 +22,7 @@ import {
 import type { Equipment } from "@/Types";
 import { createBooking } from "@/lib/actions/booking";
 import { authClient } from "@/lib/auth-client";
+import { authFetch } from "@/lib/api/authFetch";
 import { toast } from "@/components/ui/toast";
 import {
   Dialog,
@@ -65,13 +66,13 @@ const EquipmentDetailsPage = () => {
   useEffect(() => {
     const load = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/equipment/${id}`);
+        const res = await authFetch(`${API_BASE_URL}/equipment/${id}`);
         if (!res.ok) throw new Error("not found");
         setItem(await res.json());
 
         // Check if favorited (only for customers)
         if (session?.user?.email && session?.user?.role === "customer") {
-          const favRes = await fetch(
+          const favRes = await authFetch(
             `${API_BASE_URL}/favorites/check?equipmentId=${id}&email=${session.user.email}`
           );
           if (favRes.ok) {
@@ -108,7 +109,7 @@ const EquipmentDetailsPage = () => {
   const toggleFavorite = async () => {
     if (!session?.user || !item || session.user.role !== "customer") return;
     try {
-      const res = await fetch(`${API_BASE_URL}/favorites`, {
+      const res = await authFetch(`${API_BASE_URL}/favorites`, {
         method: isFav ? "DELETE" : "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({

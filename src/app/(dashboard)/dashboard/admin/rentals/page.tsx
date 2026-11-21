@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Loader2, Package, Store } from "lucide-react";
 import type { AdminRental } from "@/Types";
+import { authFetch } from "@/lib/api/authFetch";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -40,7 +41,7 @@ export default function AdminRentalsPage() {
   useEffect(() => {
     async function loadRentals() {
       try {
-        const res = await fetch(`${API_BASE_URL}/rentals`);
+        const res = await authFetch(`${API_BASE_URL}/rentals`);
         if (!res.ok) throw new Error();
         const data: AdminRental[] = await res.json();
         setRentals(data);

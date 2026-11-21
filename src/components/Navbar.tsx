@@ -13,6 +13,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
+import { clearToken } from "@/lib/api/authFetch";
 import { toast } from "@/components/ui/toast";
 
 const links = [
@@ -68,6 +69,7 @@ const Navbar = () => {
   }, []);
 
   const handleSignOut = async () => {
+    clearToken();
     await authClient.signOut();
 
     setMenuOpen(false);

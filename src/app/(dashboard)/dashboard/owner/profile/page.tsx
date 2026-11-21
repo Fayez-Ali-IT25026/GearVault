@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@/components/ui/toast";
 import { Loader2, Pencil, Save, X, User, Mail, Calendar, Package, Phone, MapPin } from "lucide-react";
+import { authFetch } from "@/lib/api/authFetch";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -24,7 +25,7 @@ export default function OwnerProfilePage() {
 
     async function loadProfile() {
       try {
-        const res = await fetch(`${API_BASE_URL}/users/${session?.user?.id}`);
+        const res = await authFetch(`${API_BASE_URL}/users/${session?.user?.id}`);
         if (!res.ok) throw new Error();
         const data = await res.json();
         setName(data.name || "");
@@ -48,7 +49,7 @@ export default function OwnerProfilePage() {
     if (!session?.user?.id) return;
     setSaving(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/users/${session.user.id}`, {
+      const res = await authFetch(`${API_BASE_URL}/users/${session.user.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, image, phone, address }),

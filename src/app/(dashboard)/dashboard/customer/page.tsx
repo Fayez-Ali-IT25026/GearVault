@@ -16,6 +16,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import type { Rental, Equipment } from "@/Types";
+import { authFetch } from "@/lib/api/authFetch";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -35,9 +36,9 @@ export default function CustomerDashboardPage() {
     async function loadAll() {
       try {
         const [rentalsRes, favsRes, equipRes] = await Promise.all([
-          fetch(`${API_BASE_URL}/my-rentals?email=${session?.user?.email}`),
-          fetch(`${API_BASE_URL}/favorites?email=${session?.user?.email}`),
-          fetch(`${API_BASE_URL}/equipment`),
+          authFetch(`${API_BASE_URL}/my-rentals?email=${session?.user?.email}`),
+          authFetch(`${API_BASE_URL}/favorites?email=${session?.user?.email}`),
+          authFetch(`${API_BASE_URL}/equipment`),
         ]);
         if (!rentalsRes.ok || !favsRes.ok || !equipRes.ok) throw new Error();
 

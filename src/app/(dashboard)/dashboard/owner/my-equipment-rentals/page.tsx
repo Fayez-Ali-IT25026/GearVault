@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Loader2, Package } from "lucide-react";
 import type { OwnerRental } from "@/Types";
+import { authFetch } from "@/lib/api/authFetch";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -41,7 +42,7 @@ export default function OwnerEquipmentRentalsPage() {
 
     async function loadRentals() {
       try {
-        const res = await fetch(
+        const res = await authFetch(
           `${API_BASE_URL}/owner-rentals?ownerId=${session?.user?.id}`
         );
         if (!res.ok) throw new Error();

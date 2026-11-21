@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { Loader2, Check, X, Package } from "lucide-react";
 import type { Equipment } from "@/Types";
+import { authFetch } from "@/lib/api/authFetch";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -28,7 +29,7 @@ export default function AdminEquipmentPage() {
   useEffect(() => {
     async function loadEquipment() {
       try {
-        const response = await fetch(`${API_BASE_URL}/equipment`);
+        const response = await authFetch(`${API_BASE_URL}/equipment`);
         if (!response.ok) throw new Error();
         const data: Equipment[] = await response.json();
         setEquipment(data);
@@ -46,7 +47,7 @@ export default function AdminEquipmentPage() {
   async function updateStatus(equipmentId: string, status: "Approved" | "Rejected") {
     setUpdatingId(equipmentId);
     try {
-      const response = await fetch(`${API_BASE_URL}/equipment/${equipmentId}`, {
+      const response = await authFetch(`${API_BASE_URL}/equipment/${equipmentId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),

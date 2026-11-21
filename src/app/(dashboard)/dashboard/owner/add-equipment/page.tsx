@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { toast } from "@/components/ui/toast";
+import { authFetch } from "@/lib/api/authFetch";
 import type {
   EquipmentCategory,
   EquipmentFormValues,
@@ -201,7 +202,7 @@ export default function AddEquipmentPage() {
 
     setIsSubmitting(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/equipment`, {
+      const response = await authFetch(`${API_BASE_URL}/equipment`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

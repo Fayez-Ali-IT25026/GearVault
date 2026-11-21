@@ -1,5 +1,6 @@
 
 import type { BookingPayload } from "@/Types";
+import { authFetch } from "@/lib/api/authFetch";
 
 
 
@@ -12,11 +13,10 @@ import type { BookingPayload } from "@/Types";
 
 export async function createBooking(payload: BookingPayload, ) {
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/create-checkout-session`, {
+    const res = await authFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/create-checkout-session`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        // Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify(payload),
       cache: "no-store",
@@ -38,11 +38,11 @@ export async function createBooking(payload: BookingPayload, ) {
 // , token: string
 
 export async function confirmPayment(sessionId: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/payment/confirm`, {
+  const res = await authFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/payment/confirm`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-    //   Authorization: `Bearer ${token}`,
+
     },
     body: JSON.stringify({ sessionId }),
     cache: "no-store",

@@ -3,6 +3,7 @@
 
 
 import type { User } from "@/Types";
+import { authFetch } from "@/lib/api/authFetch";
 
 export async function getAllUsers(): Promise<User[]> {
 //   const jwtToken = await auth.api.getToken({ headers: await headers() });
@@ -12,10 +13,10 @@ export async function getAllUsers(): Promise<User[]> {
 //   const token = jwtToken?.token;
 //   console.log(token, 'jwt token');
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users`, {
+  const res = await authFetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/users`, {
     headers: {
       "Content-Type": "application/json",
-    //   "authorization": `Bearer ${token}`
+
     },
     cache: "no-store"
   });

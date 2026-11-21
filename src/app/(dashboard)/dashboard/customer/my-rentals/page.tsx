@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Loader2, ArrowRight, Package } from "lucide-react";
+import { authFetch } from "@/lib/api/authFetch";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -61,7 +62,7 @@ export default function MyRentalsPage() {
 
     async function fetchRentals() {
       try {
-        const response = await fetch(
+        const response = await authFetch(
           `${API_BASE_URL}/my-rentals?email=${session?.user?.email}`
         );
         if (!response.ok) throw new Error();
