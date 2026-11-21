@@ -147,6 +147,7 @@ function EquipmentCard({ item }: { item: Equipment }) {
 export default function AllEquipmentPage() {
   const [filters, setFilters] = useState<Filters>(emptyFilters);
   const [search, setSearch] = useState("");
+  const [sort, setSort] = useState("newest");
   const [items, setItems] = useState<Equipment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -170,6 +171,9 @@ export default function AllEquipmentPage() {
         if (filters.maxPrice) params.set("maxPrice", filters.maxPrice);
         if (search) params.set("search", search);
 
+        // Sort order
+        if (sort) params.set("sort", sort);
+
         // Only show items that are marked Available (unless "All statuses" is picked).
         if (filters.status) params.set("status", filters.status);
 
@@ -189,7 +193,7 @@ export default function AllEquipmentPage() {
     }, 350);
 
     return () => clearTimeout(timer);
-  }, [filters, search, reloadKey]);
+  }, [filters, search, sort, reloadKey]);
 
   function updateFilter(name: keyof Filters, value: string) {
     setFilters((current) => ({ ...current, [name]: value }));
@@ -324,6 +328,17 @@ export default function AllEquipmentPage() {
             >
               <option value="Approved,Available">Available</option>
               <option value="">All statuses</option>
+            </select>
+
+            <select
+              value={sort}
+              onChange={(event) => setSort(event.target.value)}
+              aria-label="Sort by"
+              className={inputClass}
+            >
+              <option value="newest">Newest first</option>
+              <option value="price_asc">Price: Low to High</option>
+              <option value="price_desc">Price: High to Low</option>
             </select>
 
             <button
