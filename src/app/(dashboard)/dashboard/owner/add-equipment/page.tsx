@@ -124,22 +124,49 @@ export default function AddEquipmentPage() {
     setForm((current) => ({ ...current, [event.target.name]: event.target.value }));
   };
 
-  const handleImageChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
-    // Keep the image small because it is sent as base64 in the JSON body.
     if (file.size > 5 * 1024 * 1024) {
       toast.error("Image too large", "Please choose an image under 5 MB.");
       event.target.value = "";
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      setForm((current) => ({ ...current, image: String(reader.result) }));
-    };
-    reader.readAsDataURL(file);
+    const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
+    if (!apiKey) {
+      toast.error("Missing API key", "Add NEXT_PUBLIC_IMGBB_API_KEY to .env");
+      event.target.value = "";
+      return;
+    }
+
+    // Upload to imgbb and save the URL instead of base64.
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error?.message || "Upload failed");
+
+      setForm((current) => ({ ...current, image: data.data.url }));
+      toast.success("Image uploaded", "Your image is ready.");
+    } catch (err) {
+      toast.error("Upload failed", err instanceof Error ? err.message : "Try again.");
+      event.target.value = "";
+    } finally {
+      setUploadingImage(false);
+    }
   };
 
   const removeImage = () => {
@@ -401,7 +428,12 @@ export default function AddEquipmentPage() {
             <span className="text-xs text-[#71717a]">PNG or JPG, up to 5 MB</span>
           </label>
 
-          {form.image ? (
+          {uploadingImage ? (
+            <div className="flex h-44 flex-1 items-center justify-center rounded-[12px] border border-white/10 bg-white/[0.02]">
+              <Loader2 className="size-6 animate-spin text-[#3b82f6]" />
+              <span className="ml-2 text-sm text-[#71717a]">Uploading…</span>
+            </div>
+          ) : form.image ? (
             <div className="relative h-44 flex-1 overflow-hidden rounded-[12px] border border-white/10">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -501,7 +533,7 @@ export default function AddEquipmentPage() {
 
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || uploadingImage}
           className="flex items-center justify-center gap-2 rounded-[12px] bg-[#3b82f6] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#2563eb] disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? (
