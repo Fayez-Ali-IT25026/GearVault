@@ -32,6 +32,11 @@ import type {
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
+// imgbb API key (from .env). The placeholder means it has not been set yet.
+const IMGBB_API_KEY = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
+const hasImgbbKey =
+  !!IMGBB_API_KEY && IMGBB_API_KEY !== "your_imgbb_api_key_here";
+
 const categories: EquipmentCategory[] = [
   "Construction Equipment",
   "Photography Equipment",
@@ -137,9 +142,12 @@ export default function AddEquipmentPage() {
       return;
     }
 
-    const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-    if (!apiKey) {
-      toast.error("Missing API key", "Add NEXT_PUBLIC_IMGBB_API_KEY to .env");
+    const apiKey = IMGBB_API_KEY;
+    if (!hasImgbbKey) {
+      toast.error(
+        "Image upload not set up",
+        "Add a real NEXT_PUBLIC_IMGBB_API_KEY to .env, then restart the dev server."
+      );
       event.target.value = "";
       return;
     }
@@ -426,7 +434,11 @@ export default function AddEquipmentPage() {
             />
             <Upload className="size-6 text-[#3b82f6]" />
             <span className="text-sm font-medium text-white">Click to upload</span>
-            <span className="text-xs text-[#71717a]">PNG or JPG, up to 5 MB</span>
+            <span className="text-xs text-[#71717a]">
+              {hasImgbbKey
+                ? "PNG or JPG, up to 5 MB"
+                : "Image hosting not configured — add an imgbb key in .env"}
+            </span>
           </label>
 
           {uploadingImage ? (

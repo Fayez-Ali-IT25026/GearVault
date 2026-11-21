@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type ChangeEvent, type FormEvent } from "react";
 import Link from "next/link";
 import {
   ShieldCheck,
@@ -14,6 +14,9 @@ import {
   ArrowRight,
   Briefcase,
   CheckCircle2,
+  Loader2,
+  Upload,
+  X,
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
@@ -37,6 +40,59 @@ export default function RegisterPage() {
 
   // "customer" or "owner". This is saved in the user document.
   const [role, setRole] = useState<SignupRole>("customer");
+
+  // Profile image: we upload the file to imgbb and keep its URL here.
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [image, setImage] = useState("");
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleImageChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image too large", "Please choose an image under 5 MB.");
+      event.target.value = "";
+      return;
+    }
+
+    const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
+    if (!apiKey || apiKey === "your_imgbb_api_key_here") {
+      toast.error("Image upload not set up", "Add NEXT_PUBLIC_IMGBB_API_KEY to .env.");
+      event.target.value = "";
+      return;
+    }
+
+    // Upload to imgbb and save the returned URL.
+    setUploadingImage(true);
+    try {
+      const formData = new FormData();
+      formData.append("image", file);
+
+      const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+
+      const data = await res.json();
+      if (!data.success) throw new Error(data.error?.message || "Upload failed");
+
+      setImage(data.data.url);
+      toast.success("Image uploaded", "Your profile photo is ready.");
+    } catch (err) {
+      toast.error("Upload failed", err instanceof Error ? err.message : "Try again.");
+      event.target.value = "";
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const removeImage = () => {
+    setImage("");
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -252,18 +308,62 @@ const handelGoogleRegister = async () => {
             {/* Profile image */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
-                Profile image URL
+                Profile image
                 <span className="text-gray-500 font-normal"> (optional)</span>
               </label>
-              <div className="relative">
-                <ImagePlus className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                <input
-                  name="image"
-                  type="url"
-                  placeholder="https://example.com/photo.jpg"
-                  className={inputClass}
-                />
+
+              {/* The uploaded imgbb URL is sent with the form as "image". */}
+              <input type="hidden" name="image" value={image} />
+
+              <div className="flex items-center gap-4">
+                {image ? (
+                  <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-full border border-white/10">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={image}
+                      alt="Profile preview"
+                      className="size-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeImage}
+                      aria-label="Remove image"
+                      className="absolute top-0 right-0 flex size-5 items-center justify-center rounded-full bg-black/70 text-white transition hover:bg-black"
+                    >
+                      <X className="size-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full border border-dashed border-white/15 bg-[#0c0d12] text-gray-500">
+                    <ImagePlus className="size-6" />
+                  </div>
+                )}
+
+                <label className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-white/15 bg-[#0c0d12] px-4 py-3.5 text-sm text-gray-400 transition-colors hover:border-blue-500/50 hover:bg-blue-500/5 hover:text-white">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                  {uploadingImage ? (
+                    <>
+                      <Loader2 className="size-4 animate-spin text-blue-400" />
+                      Uploading…
+                    </>
+                  ) : (
+                    <>
+                      <Upload className="size-4 text-blue-400" />
+                      {image ? "Change photo" : "Choose from computer"}
+                    </>
+                  )}
+                </label>
               </div>
+
+              <p className="text-xs text-gray-500 mt-2">
+                PNG or JPG, up to 5 MB.
+              </p>
             </div>
 
             {/* Password */}
@@ -336,7 +436,8 @@ const handelGoogleRegister = async () => {
             {/* Submit */}
             <button
               type="submit"
-              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 rounded-xl transition-all duration-200 shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30 group"
+              disabled={uploadingImage}
+              className="w-full flex items-center justify-center gap-2 bg-blue-600 hover:bg-blue-500 text-white font-semibold py-3.5 rounded-xl transition-all duration-200 shadow-lg shadow-blue-600/20 hover:shadow-blue-500/30 group disabled:cursor-not-allowed disabled:opacity-60"
             >
               Create Account
               <ArrowRight
