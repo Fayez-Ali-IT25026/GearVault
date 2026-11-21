@@ -205,3 +205,16 @@ export type AdminRental = {
   paymentStatus: string;
   createdAt: string;
 };
+
+/** Monthly stats data returned by /admin-stats and /owner-stats. */
+export type MonthlyStat = {
+  month: string;
+  count?: number;
+  amount?: number;
+};
+
+export type DashboardStats = {
+  monthlyBookings: MonthlyStat[];
+  monthlyEarnings: MonthlyStat[];
+  pendingApprovals: number;
+};

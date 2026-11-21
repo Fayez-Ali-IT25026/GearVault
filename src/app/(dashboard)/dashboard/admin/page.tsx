@@ -14,7 +14,17 @@ import {
   XCircle,
   DollarSign,
 } from "lucide-react";
-import type { User, Equipment, AdminRental } from "@/Types";
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Line,
+  LineChart,
+  XAxis,
+  YAxis,
+} from "recharts";
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
+import type { User, Equipment, AdminRental, DashboardStats } from "@/Types";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
 
@@ -24,6 +34,7 @@ export default function AdminDashboardPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [rentals, setRentals] = useState<AdminRental[]>([]);
+  const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -31,16 +42,18 @@ export default function AdminDashboardPage() {
   useEffect(() => {
     async function loadAll() {
       try {
-        const [usersRes, equipRes, rentalsRes] = await Promise.all([
+        const [usersRes, equipRes, rentalsRes, statsRes] = await Promise.all([
           fetch(`${API_BASE_URL}/users`),
           fetch(`${API_BASE_URL}/equipment`),
           fetch(`${API_BASE_URL}/rentals`),
+          fetch(`${API_BASE_URL}/admin-stats`),
         ]);
-        if (!usersRes.ok || !equipRes.ok || !rentalsRes.ok) throw new Error();
+        if (!usersRes.ok || !equipRes.ok || !rentalsRes.ok || !statsRes.ok) throw new Error();
 
         setUsers(await usersRes.json());
         setEquipment(await equipRes.json());
         setRentals(await rentalsRes.json());
+        setStats(await statsRes.json());
         setError("");
       } catch {
         setError("Could not load dashboard data. Is the backend running?");
@@ -74,7 +87,7 @@ export default function AdminDashboardPage() {
     .reduce((sum, r) => sum + r.totalAmount, 0);
   const recentRentals = rentals.slice(0, 5);
 
-  const stats = [
+  const statCards = [
     {
       label: "Total Users",
       value: totalUsers,
@@ -144,7 +157,7 @@ export default function AdminDashboardPage() {
 
       {/* Stats cards */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
+        {statCards.map((stat) => (
           <Link
             key={stat.label}
             href={stat.href}
@@ -176,6 +189,55 @@ export default function AdminDashboardPage() {
           </div>
         </div>
       </div>
+
+      {/* Charts */}
+      {stats && (
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          {/* Monthly Bookings Chart */}
+          <div className="rounded-[16px] border border-white/10 bg-[#0f1016] p-5">
+            <h2 className="mb-4 text-lg font-semibold text-white">Monthly Bookings</h2>
+            <ChartContainer
+              config={{
+                count: { label: "Bookings", color: "#3b82f6" },
+              }}
+              className="h-64"
+            >
+              <BarChart data={stats.monthlyBookings}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar dataKey="count" fill="var(--color-count)" radius={4} />
+              </BarChart>
+            </ChartContainer>
+          </div>
+
+          {/* Monthly Earnings Chart */}
+          <div className="rounded-[16px] border border-white/10 bg-[#0f1016] p-5">
+            <h2 className="mb-4 text-lg font-semibold text-white">Monthly Earnings (৳)</h2>
+            <ChartContainer
+              config={{
+                amount: { label: "Earnings", color: "#22c55e" },
+              }}
+              className="h-64"
+            >
+              <LineChart data={stats.monthlyEarnings}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="month" />
+                <YAxis />
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Line
+                  type="monotone"
+                  dataKey="amount"
+                  stroke="var(--color-amount)"
+                  strokeWidth={2}
+                  dot={{ r: 4 }}
+                />
+              </LineChart>
+            </ChartContainer>
+          </div>
+        </div>
+      )}
 
       {/* Recent rentals */}
       <div className="overflow-hidden rounded-[16px] border border-white/10 bg-[#0f1016]">
